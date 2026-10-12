@@ -1,0 +1,198 @@
+{
+  "provenance": "authored_synthetic",
+  "generated_by_provider": false,
+  "review_kind": "author_scored_reference",
+  "source": {
+    "id": "segmentation-policy",
+    "text": "A private network contains application and data subnets. Only application-to-data access is permitted; every other origin-to-data access is denied. The policy aims to restrict data access to the application. To check a request, identify its origin and compare it with the permitted application origin: application is allowed, all other origins are denied. No cost, ROI, availability, performance or compliance measurements are provided."
+  },
+  "rubric": {
+    "minimum_total": 7,
+    "gates": {"fidelity": 2, "format": 2},
+    "dimensions": {
+      "objective": {
+        "0": "No observable source-based aim, or the activity contradicts the declared aim and audience needs.",
+        "1": "An observable aim is present but the item practices only part of it or needs clarification.",
+        "2": "An observable aim states an action and source concept; the item and expected evidence directly practice it at an accessible audience level."
+      },
+      "cognitive_process": {
+        "0": "The item performs a different process from the declared activity; naming Bloom alone earns no credit.",
+        "1": "The intended process is partly practiced but its reasoning or verification is incomplete.",
+        "2": "The activity actually practices the declared process and makes the answer, reasoning or verification observable, when supported by the source."
+      },
+      "fidelity": {
+        "0": "A factual or numerical claim contradicts the source or invents unsupported information.",
+        "1": "No contradiction is apparent, but the supporting source connection or an important limitation is unclear.",
+        "2": "Claims and expected answers are traceable to the supplied source; analogies are bounded and unavailable evidence is not invented."
+      },
+      "format": {
+        "0": "Invalid JSON or missing required content/item fields.",
+        "1": "JSON and fields are present but a format instruction is violated, such as an ambiguous quiz answer.",
+        "2": "Valid existing content/item shape and all applicable format instructions, including four quiz options and a determinate answer."
+      }
+    },
+    "decision": "Pass requires at least 7/8, every dimension at least 1, fidelity exactly 2 and format exactly 2. Review content before assigning scores; valid JSON and prompt coverage alone never establish quality."
+  },
+  "samples": [
+    {
+      "id": "beginner-recall",
+      "profile": "Principiante",
+      "format": "Flashcards",
+      "source_id": "segmentation-policy",
+      "objective": "Identify the two subnets and explain their access relationship using a bounded analogy.",
+      "cognitive_process": "Remember / Understand",
+      "content": {
+        "titulo": "Two areas of a private network",
+        "introduccion_contextualizada": "Identify application and data subnets and explain their access relationship. Think of two named rooms; this analogy explains separation, not additional network behavior.",
+        "items": [{
+          "frente": "Which two subnets does the source name, and which one may access data?",
+          "dorso": "The application and data subnets. Only the application may access data; every other origin is denied.",
+          "pista_didactica": "Two named rooms: the application room has permission to enter the data room. The analogy does not add security guarantees."
+        }]
+      },
+      "scores": {"objective": 2, "cognitive_process": 2, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "Naming the two subnets and explaining who may access data fulfills the introduction's aim in accessible language.",
+        "cognitive_process": "The front prompts recall; the back explains the access relationship and the hint bounds the analogy.",
+        "fidelity": "Subnet names and allowed/denied origins are explicit in the source; no security guarantees are added.",
+        "format": "The content has the existing three fields and a nonempty front, back and hint."
+      },
+      "evidence_excerpt": "Only the application may access data",
+      "expected_pass": true
+    },
+    {
+      "id": "junior-rule-application",
+      "profile": "Junior",
+      "format": "Tutorial",
+      "source_id": "segmentation-policy",
+      "objective": "Apply the documented origin rule and verify the expected decision for two requests.",
+      "cognitive_process": "Apply",
+      "content": {
+        "titulo": "Apply the source policy",
+        "introduccion_contextualizada": "Apply the documented rule to application and other origins, then verify each decision. This is a policy exercise, not a deployment command.",
+        "items": [{
+          "paso": 1,
+          "titulo_paso": "Compare each origin with the permitted application origin",
+          "descripcion": "For application-to-data, select allowed. For another origin-to-data, select denied. Follow the source's origin-comparison procedure.",
+          "comando_o_codigo": null,
+          "verificacion": "Check the decisions against the source: application allowed, any other origin denied. No live network result is claimed."
+        }]
+      },
+      "scores": {"objective": 2, "cognitive_process": 2, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "The step executes the stated two-request exercise with explicit observable decisions.",
+        "cognitive_process": "Comparing origins applies the supplied procedure; verification names both expected results.",
+        "fidelity": "Both decisions follow the source, and no missing CLI command or live outcome is invented.",
+        "format": "The numbered step, action title, description and verification are present; optional code is null."
+      },
+      "evidence_excerpt": "application allowed, any other origin denied",
+      "expected_pass": true
+    },
+    {
+      "id": "senior-rule-analysis",
+      "profile": "Senior",
+      "format": "Quiz",
+      "source_id": "segmentation-policy",
+      "objective": "Apply the same Junior/Senior origin rule and distinguish supported from unsupported conclusions.",
+      "cognitive_process": "Apply / Analyze",
+      "content": {
+        "titulo": "Distinguish policy conclusions",
+        "introduccion_contextualizada": "Apply the origin rule and analyze the alternatives. Junior and Senior share these pedagogical expectations; this quiz does not define a higher Senior tier.",
+        "items": [{
+          "pregunta": "Another origin requests data access. Which conclusion follows from the source?",
+          "opciones": ["A. Access is denied.", "B. Every origin is allowed.", "C. ROI increases by 20%.", "D. Availability is guaranteed."],
+          "respuesta_correcta": "A. Access is denied.",
+          "justificacion_didactica": "A follows the denial of every other origin. B contradicts that rule. C and D cannot be inferred because the source gives no ROI or availability measurements.",
+          "pista_didactica": "Compare the request origin with the sole permitted application origin."
+        }]
+      },
+      "scores": {"objective": 2, "cognitive_process": 2, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "The question applies the shared rule to a case and asks the learner to distinguish conclusions.",
+        "cognitive_process": "The explanation contrasts a supported answer, a contradiction and unsupported metrics.",
+        "fidelity": "The answer follows the denial rule; numerical/availability distractors are explicitly rejected, not asserted.",
+        "format": "Four alternatives, an exact correct option, explanation of each alternative and a hint are present."
+      },
+      "evidence_excerpt": "A follows the denial of every other origin",
+      "expected_pass": true
+    },
+    {
+      "id": "leader-policy-explanation",
+      "profile": "Lider",
+      "format": "Guion",
+      "source_id": "segmentation-policy",
+      "objective": "Explain the permitted and denied cases visually, without requiring unsupported architectural trade-offs.",
+      "cognitive_process": "Understand",
+      "content": {
+        "titulo": "Explain the access boundary",
+        "introduccion_contextualizada": "Explain both access cases using the documented boundary. The source supplies no competing architecture or availability evidence, so this scene does not require Evaluate.",
+        "items": [{
+          "bloque": "Development",
+          "narrativa": "Application-to-data is allowed; every other origin-to-data is denied. Explain how this implements the stated aim of restricting data access to the application.",
+          "recurso_visual": "Two labeled subnets with an allowed application-to-data arrow and a crossed-out other-origin-to-data arrow."
+        }]
+      },
+      "scores": {"objective": 2, "cognitive_process": 2, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "The scene explains the stated boundary and makes its two cases visible.",
+        "cognitive_process": "Narration and diagram explain the source relationship; cognition follows the activity rather than a rigid leader tier.",
+        "fidelity": "Only documented access cases and the source aim are presented; unavailable trade-offs are acknowledged.",
+        "format": "The scene contains a block, narration and a concrete matching visual resource."
+      },
+      "evidence_excerpt": "Application-to-data is allowed; every other origin-to-data is denied",
+      "expected_pass": true
+    },
+    {
+      "id": "manager-supported-recommendation",
+      "profile": "Gestor",
+      "format": "Resumen Ejecutivo",
+      "source_id": "segmentation-policy",
+      "objective": "Explain the policy's documented impact and justify a recommendation against its stated access criterion.",
+      "cognitive_process": "Understand / Evaluate",
+      "content": {
+        "titulo": "Keep access aligned with the documented aim",
+        "introduccion_contextualizada": "Explain the documented access restriction and justify retaining the rule using the source criterion, not invented ROI or compliance results.",
+        "items": [{
+          "concepto": "Only application-to-data access is permitted.",
+          "impacto": "Other origins are denied, matching the stated aim of restricting data access to the application.",
+          "recomendacion": "Retain that rule to satisfy the stated application-only criterion. No costs, ROI or compliance measurements are supplied; obtain separate evidence before drawing those conclusions."
+        }]
+      },
+      "scores": {"objective": 2, "cognitive_process": 2, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "The item explains the actual restriction and justifies a decision using the documented aim.",
+        "cognitive_process": "The recommendation evaluates the rule against the explicit application-only criterion, rather than merely naming Evaluate.",
+        "fidelity": "Access impact is supported; unavailable business metrics and compliance evidence are explicitly bounded.",
+        "format": "Concept, impact and justified recommendation use existing executive-summary fields."
+      },
+      "evidence_excerpt": "Retain that rule to satisfy the stated application-only criterion",
+      "expected_pass": true
+    },
+    {
+      "id": "negative-beginner-process-mismatch",
+      "profile": "Principiante",
+      "format": "Flashcards",
+      "source_id": "segmentation-policy",
+      "objective": "Identify the two subnet names and explain their roles in accessible language.",
+      "cognitive_process": "Remember / Understand",
+      "content": {
+        "titulo": "Names and roles",
+        "introduccion_contextualizada": "Identify the two subnets and explain their roles.",
+        "items": [{
+          "frente": "Justify the ingress-policy invariant by evaluating permitted and denied origin classes.",
+          "dorso": "Only application-to-data is permitted; the policy meets the application-only criterion by denying every other origin.",
+          "pista_didactica": "Evaluate the permitted-origin invariant."
+        }]
+      },
+      "scores": {"objective": 0, "cognitive_process": 0, "fidelity": 2, "format": 2},
+      "rationale": {
+        "objective": "The item never asks for both subnet names or accessible roles; unexplained specialist phrasing contradicts the declared beginner aim.",
+        "cognitive_process": "The question demands evaluation/justification instead of the declared recall/explanation activity; its hint repeats jargon without scaffolding.",
+        "fidelity": "The policy claim and application-only criterion remain source-supported: this is not a hallucination example.",
+        "format": "Valid JSON and nonempty front, back and hint satisfy the existing flashcard structure despite pedagogical misalignment."
+      },
+      "evidence_excerpt": "Justify the ingress-policy invariant",
+      "expected_pass": false
+    }
+  ]
+}
