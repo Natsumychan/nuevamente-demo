@@ -41,6 +41,9 @@ class SolicitudAdaptacion(BaseModel):
     formato_salida: FormatoSalida = Field(default=FormatoSalida.FLASHCARDS)
     nicho_sector: NichoSector = Field(default=NichoSector.GENERAL)
     nivel_detalle: NivelDetalle = Field(default=NivelDetalle.DIDACTICO)
+    documento_id: Optional[str] = Field(
+        default=None, exclude=True, description="Internal selected-document retrieval identity",
+    )
 
 # --- Modelos de Elementos Pedagógicos (Items) ---
 class FlashcardItem(BaseModel):

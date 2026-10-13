@@ -40,6 +40,7 @@ def to_domain_request(payload: AdaptationCreateRequest, document: DocumentRecord
     return SolicitudAdaptacion(
         documento_titulo=document.title,
         documento_contenido=document.content,
+        documento_id=document.rag_document_id,
         perfil_destinatario=PROFILE_TO_DOMAIN[payload.profile.value],
         formato_salida=FORMAT_TO_DOMAIN[payload.format.value],
         nicho_sector=INDUSTRY_TO_DOMAIN[payload.industry.value],

@@ -31,6 +31,9 @@ class VectorStoreManager:
 
         documents = [c["content"] for c in chunks]
         metadatas = [{field: chunk[field] for field in RAG_METADATA_FIELDS} for chunk in chunks]
+        for chunk, metadata in zip(chunks, metadatas):
+            if chunk.get("document_id") is not None:
+                metadata["document_id"] = chunk["document_id"]
         ids = [c["chunk_id"] for c in chunks]
 
         # Upsert en ChromaDB
@@ -41,17 +44,24 @@ class VectorStoreManager:
         )
         logger.info(f"Se indexaron {len(chunks)} fragmentos en ChromaDB.")
 
-    def search_similar(self, query: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
-        """Realiza una búsqueda semántica y retorna los fragmentos más relevantes."""
+    def search_similar(
+        self, query: str, top_k: Optional[int] = None, *, document_id: str | None = None,
+    ) -> List[Dict[str, Any]]:
+        """Search one document when scoped; preserve legacy unscoped retrieval."""
         k = top_k or settings.TOP_K_RETRIEVAL
-        count = self.collection.count()
+        scope = {} if document_id is None else {"where": {"document_id": document_id}}
+        count = (
+            len(self.collection.get(**scope, include=[])["ids"])
+            if document_id is not None else self.collection.count()
+        )
         if count == 0:
             return []
 
         actual_k = min(k, count)
         results = self.collection.query(
             query_texts=[query],
-            n_results=actual_k
+            n_results=actual_k,
+            **scope,
         )
 
         retrieved_docs = []

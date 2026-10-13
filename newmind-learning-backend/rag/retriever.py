@@ -9,7 +9,9 @@ class RAGRetriever:
     def __init__(self, vs=None):
         self.vector_store = vs or vector_store
 
-    def retrieve_context(self, query: str, top_k: int = 4) -> Tuple[str, List[Dict[str, Any]], float]:
+    def retrieve_context(
+        self, query: str, top_k: int = 4, *, document_id: str | None = None,
+    ) -> Tuple[str, List[Dict[str, Any]], float]:
         """
         Recupera los fragmentos más pertinentes para la consulta.
         Retorna:
@@ -17,7 +19,8 @@ class RAGRetriever:
           - Lista de chunks recuperados
           - Puntuación promedio de similitud / anclaje a fuente
         """
-        chunks = self.vector_store.search_similar(query=query, top_k=top_k)
+        scope = {} if document_id is None else {"document_id": document_id}
+        chunks = self.vector_store.search_similar(query=query, top_k=top_k, **scope)
         if not chunks:
             return "", [], 0.0
 

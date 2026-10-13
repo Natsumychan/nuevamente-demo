@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from threading import RLock
 from typing import Any
+from uuid import uuid4
 
 from models.schemas import SolicitudAdaptacion
 from storage.contracts import StorageResult
@@ -26,6 +27,7 @@ class DocumentRecord:
     created_at: datetime
     storage_object_id: str
     storage: StorageResult | None = None
+    rag_document_id: str = field(default_factory=lambda: uuid4().hex)
 
 
 @dataclass(frozen=True, slots=True)

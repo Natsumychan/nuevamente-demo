@@ -193,7 +193,7 @@ class FakeChunker:
     def __init__(self) -> None:
         self.document: NormalizedDocument | None = None
 
-    def split_document(self, document: NormalizedDocument) -> list[dict[str, Any]]:
+    def split_document(self, document: NormalizedDocument, *, document_id=None) -> list[dict[str, Any]]:
         self.document = document
         return [{"chunk_id": "stable-0", "content": document.text}]
 
@@ -438,6 +438,7 @@ def test_http_upload_uses_real_ingestion_chunking_and_vector_metadata(
     assert len(vector_store.chunks) == 1
     chunk = vector_store.chunks[0]
     assert chunk["content"] == expected_text
+    assert chunk["document_id"] == record.rag_document_id
     assert chunk["source_filename"] == filename
     assert chunk["document_type"] == expected_type
     if expected_type == "pdf":
