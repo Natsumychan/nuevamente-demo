@@ -36,8 +36,10 @@ class LLMEngine:
     def adapt_content(self, request: SolicitudAdaptacion) -> RespuestaAdaptacion:
         """Flujo integral de adaptación pedagógica."""
         # 1. Recuperación de contexto RAG
+        scope = {} if request.documento_id is None else {"document_id": request.documento_id}
         context_text, retrieved_chunks, avg_similarity = rag_retriever.retrieve_context(
-            query=f"{request.documento_titulo} {request.perfil_destinatario.value} {request.formato_salida.value}"
+            query=f"{request.documento_titulo} {request.perfil_destinatario.value} {request.formato_salida.value}",
+            **scope,
         )
         
         if not context_text:

@@ -336,6 +336,31 @@ La suite cubre:
 El repositorio no configura comandos de lint ni de comprobación estática de
 tipos para este backend; no deben asumirse como parte de la verificación actual.
 
+## Recuperación aislada por documento
+
+`POST /api/v1/adaptations` sigue usando el `documentId` de la carga seleccionada;
+no se requieren parámetros ni flags nuevos. El backend asigna una identidad UUID
+interna a cada documento y la conserva en los metadatos de sus chunks y en la
+solicitud de adaptación. Dos cargas con el mismo nombre, incluso con contenido
+idéntico, conservan identidades y chunks independientes.
+
+La recuperación aplica el mismo filtro `document_id` al conteo y a la consulta
+de Chroma. Top-K se limita a los chunks del documento seleccionado. Si no hay
+chunks o resultados, el motor usa exclusivamente el texto de ese documento,
+con puntuación de anclaje cero; nunca reintenta sobre toda la colección.
+
+No hay migración de vectores existentes: los chunks antiguos sin identidad se
+mantienen disponibles para llamadas internas de recuperación sin filtro, pero
+no participan en adaptaciones seleccionadas mediante la API. Las llamadas
+internas anteriores sin identidad conservan su comportamiento sin filtro.
+Las identidades no cambian al actualizar el destino de almacenamiento; los
+registros documentales siguen siendo efímeros según las limitaciones del MVP.
+
+Regresión determinista con Chroma persistente y embeddings locales:
+`python -m pytest tests/test_document_isolation.py tests/test_vector_store.py -q`.
+Las pruebas recorren carga, selección y adaptación HTTP; sustituyen únicamente
+los proveedores de generación y almacenamiento para no consumir servicios.
+
 ## Limitaciones conocidas
 
 - **Metadatos en memoria:** documentos, trabajos, estados y resultados se

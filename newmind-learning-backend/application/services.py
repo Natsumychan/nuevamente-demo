@@ -105,7 +105,9 @@ class DocumentService:
         )
 
         try:
-            chunks = self.chunker.split_document(normalized_document)
+            chunks = self.chunker.split_document(
+                normalized_document, document_id=record.rag_document_id,
+            )
             self.vector_store.add_chunks(chunks)
             storage = self.storage.upload_raw_document(
                 record.storage_object_id, content, content_type

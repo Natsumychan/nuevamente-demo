@@ -31,7 +31,9 @@ class DocumentChunker:
                 "chunk_size must be positive and chunk_overlap must be between 0 and chunk_size - 1"
             )
 
-    def split_document(self, document: NormalizedDocument) -> list[dict[str, Any]]:
+    def split_document(
+        self, document: NormalizedDocument, *, document_id: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Split one normalized document into bounded, overlapping RAG chunks."""
         if not document.text:
             return []
@@ -41,11 +43,14 @@ class DocumentChunker:
             for start, end in self._plan_ranges(document.text)
         ]
         document_digest = self._document_digest(document)
+        chunk_namespace = (
+            document_digest if document_id is None else f"{document_id}-{document_digest}"
+        )
         chunk_count = len(contents)
 
         return [
             {
-                "chunk_id": f"{document_digest}-chunk-{index:04d}",
+                "chunk_id": f"{chunk_namespace}-chunk-{index:04d}",
                 "content": content,
                 "source_filename": document.source.filename,
                 "document_type": document.type.value,
@@ -54,6 +59,7 @@ class DocumentChunker:
                 "chunk_index": index,
                 "chunk_count": chunk_count,
                 "chunk_length": len(content),
+                **({"document_id": document_id} if document_id is not None else {}),
             }
             for index, content in enumerate(contents)
         ]
