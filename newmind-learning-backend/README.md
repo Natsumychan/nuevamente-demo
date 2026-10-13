@@ -131,6 +131,11 @@ curl --fail \
   http://localhost:8000/api/v1/documents
 ```
 
+El [corpus cloud autorizado](data/samples/cloud_corpus/README.md) incluye MD,
+TXT y PDF con tablas y columnas, procedencia y expectativas de extracción.
+Sus pruebas HTTP usan ingesta real y almacenamiento simulado; no requieren un
+bucket OCI activo. Solo los documentos enumerados en su manifiesto son muestras.
+
 ### Evidencia de almacenamiento de originales (CLO-02)
 
 Las respuestas de carga, listado y detalle incluyen `filename` (nombre original)

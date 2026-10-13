@@ -1,0 +1,46 @@
+%PDF-1.4
+%Documento sintetico original
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 559 >>
+stream
+BT /F1 14 Tf 45 750 Td (Ejercicio de redes cloud) Tj ET
+306 620 m 306 725 l S
+BT /F1 10 Tf 45 705 Td (Subred p\372blica) Tj ET
+BT /F1 10 Tf 45 680 Td (Entrada: pasarela HTTPS gestionada.) Tj ET
+BT /F1 10 Tf 45 655 Td (Ruta: pasarela de internet.) Tj ET
+BT /F1 10 Tf 45 630 Td (Carga: interfaz sin estado.) Tj ET
+BT /F1 10 Tf 330 705 Td (Subred privada) Tj ET
+BT /F1 10 Tf 330 680 Td (Entrada: punto de acceso interno.) Tj ET
+BT /F1 10 Tf 330 655 Td (Ruta: NAT para actualizar paquetes.) Tj ET
+BT /F1 10 Tf 330 630 Td (Carga: procesos de aplicaci\363n.) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Title (Ejercicio de redes cloud) /Author (Material original con asistencia de IA) /Subject (Corpus sint\351tico para la incidencia 60) >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000039 00000 n 
+0000000088 00000 n 
+0000000145 00000 n 
+0000000271 00000 n 
+0000000368 00000 n 
+0000000977 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R /Info 6 0 R >>
+startxref
+1134
+%%EOF
