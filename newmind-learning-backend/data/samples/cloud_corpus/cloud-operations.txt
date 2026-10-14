@@ -1,0 +1,12 @@
+﻿Ejercicio de operaciones cloud
+
+CaféNube almacena por separado documentos originales y contenidos educativos derivados.
+Los identificadores de objeto son únicos aunque se repitan los nombres de archivo.
+
+
+Lista de comprobación de incidentes
+1. Comprobar la disponibilidad del servicio antes de reintentar una carga.
+2. Verificar los bytes originales de forma independiente después de una escritura exitosa.
+3. Distinguir la emulación local de la persistencia confirmada en la nube.
+
+Este ejemplo ficticio no define cuentas, buckets ni credenciales reales.

@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "purpose": "Corpus cloud pequeño y autorizado para evaluar la ingesta determinista y la fidelidad de extracción; no es una prueba de rendimiento ni una guía oficial del proveedor.",
+  "documents": {
+    "cloud-networking.md": {
+      "origin": {
+        "kind": "original_synthetic",
+        "creator": "Material original creado con asistencia de IA para la incidencia #60 de NewMind",
+        "source": "cloud-networking.md"
+      },
+      "authorization": {
+        "declaration": "AUTHORIZATION.md",
+        "scope": "project_ingestion_tests_and_evaluations"
+      },
+      "sha256": "8a8f1f6d11b2052b7d03820593791af3f841c135c3d3eb83cbb5fcc7d31f01a7",
+      "type": "md",
+      "content_type": "text/markdown",
+      "page_count": null,
+      "extractors": ["utf-8"],
+      "expected_text": "# Laboratorio de redes cloud\n\n## Escenario\n\nCaféNube ejecuta una interfaz web y procesos en segundo plano en subredes cloud separadas. Este escenario ficticio es educativo, no una guía de despliegue en producción.\n\n## Límites\n\n- La subred pública recibe tráfico HTTPS mediante una pasarela gestionada.\n- La subred privada aloja procesos sin acceso entrante directo desde internet.\n- Las identidades de servicio reciben solo los permisos necesarios para su carga de trabajo.\n\n## Notas de despliegue\n\n```text\ninterfaz web -> pasarela gestionada -> subred pública\nprocesos -> punto de acceso interno -> subred privada\n```"
+    },
+    "cloud-operations.txt": {
+      "origin": {
+        "kind": "original_synthetic",
+        "creator": "Material original creado con asistencia de IA para la incidencia #60 de NewMind",
+        "source": "cloud-operations.txt"
+      },
+      "authorization": {
+        "declaration": "AUTHORIZATION.md",
+        "scope": "project_ingestion_tests_and_evaluations"
+      },
+      "sha256": "0e1c1dde89ac7d947c46520e51aa4e6d1ddafc622d260ac21ee5b3aa9e3208e5",
+      "type": "txt",
+      "content_type": "text/plain",
+      "page_count": null,
+      "extractors": ["utf-8"],
+      "expected_text": "Ejercicio de operaciones cloud\n\nCaféNube almacena por separado documentos originales y contenidos educativos derivados.\nLos identificadores de objeto son únicos aunque se repitan los nombres de archivo.\n\nLista de comprobación de incidentes\n1. Comprobar la disponibilidad del servicio antes de reintentar una carga.\n2. Verificar los bytes originales de forma independiente después de una escritura exitosa.\n3. Distinguir la emulación local de la persistencia confirmada en la nube.\n\nEste ejemplo ficticio no define cuentas, buckets ni credenciales reales."
+    },
+    "cloud-retention-table.pdf": {
+      "origin": {
+        "kind": "original_synthetic",
+        "creator": "Material original creado con asistencia de IA para la incidencia #60 de NewMind",
+        "source": "cloud-retention-table.pdf"
+      },
+      "authorization": {
+        "declaration": "AUTHORIZATION.md",
+        "scope": "project_ingestion_tests_and_evaluations"
+      },
+      "sha256": "3e951188c10336c711ca87fbb2518be74c3a5defc16e887681f59899d2095767",
+      "type": "pdf",
+      "content_type": "application/pdf",
+      "page_count": 1,
+      "extractors": ["pypdf", "pymupdf"],
+      "expected_text": "Ejercicio de retención cloud\nServicio Responsable Retención\nRegistros de auditoría Plataforma 30 días\nRevisiones de acceso Seguridad 90 días\nCopias de respaldo Operaciones 14 días",
+      "layout": {
+        "kind": "table",
+        "description": "Tres columnas con bordes visibles; leer el título, los encabezados de izquierda a derecha y cada fila de izquierda a derecha, de arriba abajo. Las celdas de varias palabras deben conservar su asociación con el encabezado y la fila.",
+        "headers": ["Servicio", "Responsable", "Retención"],
+        "rows": [
+          {"Servicio": "Registros de auditoría", "Responsable": "Plataforma", "Retención": "30 días"},
+          {"Servicio": "Revisiones de acceso", "Responsable": "Seguridad", "Retención": "90 días"},
+          {"Servicio": "Copias de respaldo", "Responsable": "Operaciones", "Retención": "14 días"}
+        ],
+        "reading_order": [
+          "Ejercicio de retención cloud",
+          "Servicio Responsable Retención",
+          "Registros de auditoría Plataforma 30 días",
+          "Revisiones de acceso Seguridad 90 días",
+          "Copias de respaldo Operaciones 14 días"
+        ]
+      }
+    },
+    "cloud-network-columns.pdf": {
+      "origin": {
+        "kind": "original_synthetic",
+        "creator": "Material original creado con asistencia de IA para la incidencia #60 de NewMind",
+        "source": "cloud-network-columns.pdf"
+      },
+      "authorization": {
+        "declaration": "AUTHORIZATION.md",
+        "scope": "project_ingestion_tests_and_evaluations"
+      },
+      "sha256": "c423bbb0022910ad7c96eca3f4069199f4e7c8a30277f0f62d4223644d013c04",
+      "type": "pdf",
+      "content_type": "application/pdf",
+      "page_count": 1,
+      "extractors": ["pypdf", "pymupdf"],
+      "expected_text": "Ejercicio de redes cloud\nSubred pública\nEntrada: pasarela HTTPS gestionada.\nRuta: pasarela de internet.\nCarga: interfaz sin estado.\nSubred privada\nEntrada: punto de acceso interno.\nRuta: NAT para actualizar paquetes.\nCarga: procesos de aplicación.",
+      "layout": {
+        "kind": "two_columns",
+        "description": "Leer el título de la página, toda la columna izquierda de arriba abajo y después toda la columna derecha de arriba abajo; no intercalar filas visualmente alineadas de distintas columnas.",
+        "columns": [
+          ["Subred pública", "Entrada: pasarela HTTPS gestionada.", "Ruta: pasarela de internet.", "Carga: interfaz sin estado."],
+          ["Subred privada", "Entrada: punto de acceso interno.", "Ruta: NAT para actualizar paquetes.", "Carga: procesos de aplicación."]
+        ],
+        "reading_order": [
+          "Ejercicio de redes cloud",
+          "Subred pública",
+          "Entrada: pasarela HTTPS gestionada.",
+          "Ruta: pasarela de internet.",
+          "Carga: interfaz sin estado.",
+          "Subred privada",
+          "Entrada: punto de acceso interno.",
+          "Ruta: NAT para actualizar paquetes.",
+          "Carga: procesos de aplicación."
+        ]
+      }
+    }
+  }
+}
