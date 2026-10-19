@@ -10,10 +10,10 @@ import { Card } from "@/shared/ui/Card";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Alert } from "@/shared/ui/Alert";
+
 import { ADAPTATION_POLL_POLICY } from "./adaptationPolling";
 
 // ── Polling helpers ────────────────────────────────────────────────────────────
-
 
 function isTerminalStatus(status) {
 	return status === "completed" || status === "failed";
@@ -82,7 +82,7 @@ function useAdaptationResult(id, initialAdaptation) {
 
 				scheduleNextPoll();
 			} catch (err) {
-				if (active) {
+				if (active && err.name !== "AbortError") {
 					setError(
 						err.message ?? "Error al consultar el estado de la adaptación.",
 					);
@@ -131,18 +131,14 @@ function useAdaptationResult(id, initialAdaptation) {
 			active = false;
 
 			clearTimeout(timeoutId);
-
 			activeStatusController?.abort();
 		};
 	}, [id, initialAdaptation, pollRun]);
 
-	/**
-	 * Reinicia el ciclo de polling desde cero.
-	 * Al incrementar pollRun, el efecto se ejecuta nuevamente
-	 * y se reinicia el contador de intentos.
-	 */
+	// Reinicia el ciclo de consulta del estado.
 	const retryPolling = () => {
 		setError(null);
+		setLoading(true);
 		setPollRun((currentRun) => currentRun + 1);
 	};
 
@@ -162,31 +158,50 @@ function AdaptationMeta({ adaptation }) {
 			<h1 className='page-title'>{adaptation.documentTitle ?? "Resultado"}</h1>
 
 			<div className='flex flex-wrap items-center gap-2 mt-2'>
-				<Badge variant='brand'>{adaptation.profile}</Badge>
-				<Badge variant='violet'>{adaptation.format}</Badge>
-				<Badge variant='default'>{adaptation.industry}</Badge>
-				<Badge variant='default'>{adaptation.detailLevel}</Badge>
+				{adaptation.profile && (
+					<Badge variant='brand'>{adaptation.profile}</Badge>
+				)}
+
+				{adaptation.format && (
+					<Badge variant='violet'>{adaptation.format}</Badge>
+				)}
+
+				{adaptation.industry && (
+					<Badge variant='default'>{adaptation.industry}</Badge>
+				)}
+
+				{adaptation.detailLevel && (
+					<Badge variant='default'>{adaptation.detailLevel}</Badge>
+				)}
 			</div>
 		</div>
 	);
 }
 
-function PageHeader({ adaptation }) {
+function PageHeader({ adaptation, onExport, exporting }) {
 	return (
-		<div className='flex items-center justify-between'>
+		<div className='flex flex-wrap items-center justify-between gap-3'>
 			<Link
 				to='/'
-				className='btn-ghost text-sm flex items-center gap-1.5'>
+				className='btn-ghost text-sm flex  text-slate-200 items-center gap-1.5'>
 				<ArrowLeft className='w-4 h-4' />
-				Dashboard
+				Volver al inicio
 			</Link>
 
 			{adaptation.status === "completed" && (
 				<Button
 					variant='secondary'
 					size='sm'
-					leftIcon={<Download className='w-4 h-4' />}>
-					Exportar
+					onClick={onExport}
+					disabled={exporting}
+					leftIcon={
+						exporting ? (
+							<RefreshCw className='w-4 h-4 animate-spin' />
+						) : (
+							<Download className='w-4 h-4' />
+						)
+					}>
+					{exporting ? "Generando PDF..." : "Exportar PDF"}
 				</Button>
 			)}
 		</div>
@@ -204,27 +219,60 @@ export function ResultPage() {
 		state?.adaptation ?? null,
 	);
 
+	// Estado de exportación del PDF.
+	const [exporting, setExporting] = useState(false);
+	const [exportError, setExportError] = useState(null);
+	const [exportSuccess, setExportSuccess] = useState(false);
+
+	// Genera y descarga el PDF de la adaptación.
+	const handleExport = async () => {
+		setExportError(null);
+		setExportSuccess(false);
+		setExporting(true);
+
+		try {
+			const { exportAdaptationPdf } = await import("./exportAdaptationPdf");
+
+			await exportAdaptationPdf(adaptation);
+			setExportSuccess(true);
+		} catch (err) {
+			setExportError(
+				err?.message ?? "No se pudo generar el PDF. Inténtalo nuevamente.",
+			);
+		} finally {
+			setExporting(false);
+		}
+	};
+
+	// Estado inicial de carga.
 	if (loading && !adaptation) {
 		return (
 			<div className='max-w-3xl mx-auto'>
 				<Card>
-					<p className='text-sm text-slate-400'>Cargando adaptación...</p>
+					<div className='flex items-center gap-3'>
+						<RefreshCw className='w-5 h-5 animate-spin text-blue-600' />
+
+						<p className='text-sm text-slate-500'>Cargando adaptación...</p>
+					</div>
 				</Card>
 			</div>
 		);
 	}
 
+	// Adaptación inexistente o no disponible.
 	if (!adaptation) {
 		return (
 			<div className='max-w-3xl mx-auto'>
 				<Alert
 					variant='error'
 					title='Adaptación no encontrada'>
-					{error ?? "No se pudo cargar la información de esta adaptación."}
+					<p>
+						{error ?? "No se pudo cargar la información de esta adaptación."}
+					</p>
 
 					<Link
 						to='/history'
-						className='block mt-2 text-sm underline'>
+						className='block mt-3 text-sm underline'>
 						Ver historial
 					</Link>
 				</Alert>
@@ -237,10 +285,46 @@ export function ResultPage() {
 
 	return (
 		<div className='max-w-4xl mx-auto space-y-8 animate-fade-in'>
-			<PageHeader adaptation={adaptation} />
+			{/* Encabezado y exportación */}
+			<PageHeader
+				adaptation={adaptation}
+				onExport={handleExport}
+				exporting={exporting}
+			/>
 
+			{/* Información general de la adaptación */}
 			<AdaptationMeta adaptation={adaptation} />
 
+			{/* Mensaje de error de exportación */}
+			{exportError && (
+				<Alert
+					variant='error'
+					title='No se pudo exportar el PDF'>
+					<p>{exportError}</p>
+
+					<div className='mt-3'>
+						<Button
+							variant='secondary'
+							size='sm'
+							onClick={handleExport}
+							disabled={exporting}>
+							Intentar nuevamente
+						</Button>
+					</div>
+				</Alert>
+			)}
+
+			{/* Mensaje de exportación completada */}
+			{exportSuccess && (
+				<Alert title='PDF generado'>
+					<p>
+						Se solicitó la descarga de tu material de estudio. Si no aparece,
+						revisa las descargas del navegador.
+					</p>
+				</Alert>
+			)}
+
+			{/* Error al consultar el estado de generación */}
 			{error && (
 				<Alert
 					variant='error'
@@ -264,24 +348,26 @@ export function ResultPage() {
 				</Alert>
 			)}
 
-			{/* Pipeline status */}
+			{/* Estado del procesamiento */}
 			{isProcessing && (
 				<Card>
 					<GenerationStatus status={adaptation.status} />
 				</Card>
 			)}
 
-			{/* Completed content */}
+			{/* Contenido generado */}
 			{adaptation.status === "completed" && (
 				<ContentViewer adaptation={adaptation} />
 			)}
 
-			{/* Failed */}
+			{/* Error durante la generación */}
 			{adaptation.status === "failed" && (
 				<Alert
 					variant='error'
 					title='Error en la generación'>
-					{adaptation.error ?? "Ocurrió un error durante el procesamiento."}
+					<p>
+						{adaptation.error ?? "Ocurrió un error durante el procesamiento."}
+					</p>
 
 					<div className='mt-3 flex flex-wrap gap-2'>
 						<Link to='/new'>
@@ -300,6 +386,25 @@ export function ResultPage() {
 						</Link>
 					</div>
 				</Alert>
+			)}
+
+			{/* Acciones posteriores al resultado */}
+			{adaptation.status === "completed" && (
+				<div className='flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5'>
+					<Link
+						to='/history'
+						className='btn-ghost text-sm'>
+						Ver historial de adaptaciones
+					</Link>
+
+					<Link to='/new'>
+						<Button
+							variant='primary'
+							size='sm'>
+							Crear otra adaptación
+						</Button>
+					</Link>
+				</div>
 			)}
 		</div>
 	);
