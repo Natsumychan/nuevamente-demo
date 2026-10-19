@@ -220,3 +220,63 @@ describe('Flashcards adaptation contract', () => {
     expect(screen.getByText('Resumen conservado.')).toBeInTheDocument()
   })
 })
+
+
+describe('Interactive quiz', () => {
+  it('does not reveal the correct answer before submission and provides feedback after checking', async () => {
+    const user = userEvent.setup()
+    const adaptation = buildAdaptation()
+    adaptation.format = 'Quiz'
+    adaptation.content = {
+      titulo: 'Quiz de OCI',
+      introduccion_contextualizada: 'Comprueba lo aprendido.',
+      items: [
+        {
+          pregunta: '¿Qué permite una VCN?',
+          opciones: ['Crear una red virtual privada', 'Eliminar las subredes'],
+          respuesta_correcta: 'Crear una red virtual privada',
+          justificacion_didactica: 'Una VCN permite organizar recursos dentro de una red virtual aislada.',
+          pista_didactica: 'Piensa en una red privada en la nube.',
+        },
+      ],
+    }
+
+    render(<ContentViewer adaptation={adaptation} />)
+
+    expect(screen.getByRole('heading', { name: '¿Qué permite una VCN?' })).toBeInTheDocument()
+    expect(screen.queryByText(/Respuesta correcta:/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Una VCN permite organizar recursos dentro de una red virtual aislada.')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'Crear una red virtual privada' }))
+    await user.click(screen.getByRole('button', { name: 'Comprobar respuesta' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('¡Respuesta correcta!')
+    expect(screen.getByText('Una VCN permite organizar recursos dentro de una red virtual aislada.')).toBeInTheDocument()
+    expect(screen.getByText('Resultado: 1 de 1 respuestas correctas.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Intentar de nuevo' })).toBeInTheDocument()
+  })
+
+  it('supports the legacy English field names without revealing the key early', async () => {
+    const user = userEvent.setup()
+    const adaptation = buildAdaptation()
+    adaptation.format = 'Quiz'
+    adaptation.content = {
+      questions: [
+        {
+          question: 'Which option is correct?',
+          options: ['Option A', 'Option B'],
+          correct_answer: 'Option B',
+          justification: 'The source states that option B is correct.',
+        },
+      ],
+    }
+
+    render(<ContentViewer adaptation={adaptation} />)
+    expect(screen.queryByText('The source states that option B is correct.')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'Option A' }))
+    await user.click(screen.getByRole('button', { name: 'Comprobar respuesta' }))
+    expect(screen.getByRole('status')).toHaveTextContent('Respuesta incorrecta')
+    expect(screen.getByRole('status')).toHaveTextContent('Respuesta correcta: Option B',)
+    expect(screen.getByText('The source states that option B is correct.')).toBeInTheDocument()
+  })
+})
