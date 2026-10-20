@@ -25,6 +25,7 @@ from models.schemas import SolicitudAdaptacion
 
 
 MAX_DOCUMENT_SIZE = 20 * 1024 * 1024
+
 INGESTION_ERROR_MESSAGES = {
     EmptyDocumentError: "Document must not be empty.",
     InvalidTextEncodingError: "Document must contain valid UTF-8 text.",
@@ -58,43 +59,68 @@ class DocumentService:
         storage: Any = None,
     ) -> None:
         self.repository = repository or DocumentRepository()
+
         if loader is None:
             from ingestion.loaders import doc_loader
 
             loader = doc_loader
+
         if chunker is None:
             from ingestion.chunker import doc_chunker
 
             chunker = doc_chunker
+
         if vector_store is None:
             from rag.vector_store import vector_store as default_vector_store
 
             vector_store = default_vector_store
+
         if storage is None:
             from storage.oci_client import oci_storage
 
             storage = oci_storage
+
         self.loader = loader
         self.chunker = chunker
         self.vector_store = vector_store
         self.storage = storage
 
-    def upload(self, filename: str, content: bytes, content_type: str) -> DocumentRecord:
+    def upload(
+        self,
+        filename: str,
+        content: bytes,
+        content_type: str,
+    ) -> DocumentRecord:
         safe_filename = sanitize_filename(filename)
         suffix = Path(safe_filename).suffix.lower()
+
         if suffix not in SUPPORTED_FORMATS:
-            raise DocumentValidationError("Unsupported document type. Allowed types: PDF, MD, TXT.")
+            raise DocumentValidationError(
+                "Unsupported document type. Allowed types: PDF, MD, TXT."
+            )
+
         if len(content) > MAX_DOCUMENT_SIZE:
-            raise DocumentValidationError("Document exceeds the 20 MB size limit.")
+            raise DocumentValidationError(
+                "Document exceeds the 20 MB size limit."
+            )
+
         if not content:
             raise DocumentValidationError("Document must not be empty.")
 
         try:
-            normalized_document = self.loader.extract_from_bytes(safe_filename, content)
+            normalized_document = self.loader.extract_from_bytes(
+                safe_filename,
+                content,
+            )
         except tuple(INGESTION_ERROR_MESSAGES) as exc:
-            raise DocumentValidationError(INGESTION_ERROR_MESSAGES[type(exc)]) from exc
+            raise DocumentValidationError(
+                INGESTION_ERROR_MESSAGES[type(exc)]
+            ) from exc
         except Exception as exc:
-            raise DocumentProcessingError("Document content could not be extracted.") from exc
+            raise DocumentProcessingError(
+                "Document content could not be extracted."
+            ) from exc
+
         record = self.repository.create(
             title=Path(safe_filename).stem,
             filename=filename,
@@ -106,25 +132,42 @@ class DocumentService:
 
         try:
             chunks = self.chunker.split_document(
-                normalized_document, document_id=record.rag_document_id,
+                normalized_document,
+                document_id=record.rag_document_id,
             )
             self.vector_store.add_chunks(chunks)
+
             storage = self.storage.upload_raw_document(
-                record.storage_object_id, content, content_type
+                record.storage_object_id,
+                content,
+                content_type,
             )
+
             record = self.repository.update_storage(record.id, storage)
+
         except Exception as exc:
             self.repository.delete(record.id)
-            raise DocumentProcessingError("Document could not be indexed or stored.") from exc
+            raise DocumentProcessingError(
+                "Document could not be indexed or stored."
+            ) from exc
+
         return record
 
     def list(self) -> list[DocumentRecord]:
         # Upload reserves a record before indexing; publish only stored originals.
-        return [record for record in self.repository.list() if record.storage is not None]
+        return [
+            record
+            for record in self.repository.list()
+            if record.storage is not None
+        ]
 
     def get(self, document_id: int) -> DocumentRecord | None:
         record = self.repository.get(document_id)
-        return record if record is not None and record.storage is not None else None
+        return (
+            record
+            if record is not None and record.storage is not None
+            else None
+        )
 
     def delete(self, document_id: int) -> bool:
         return self.repository.delete(document_id)
@@ -140,10 +183,12 @@ class AdaptationService:
     ) -> None:
         self.document_service = document_service
         self.repository = repository or AdaptationRepository()
+
         if engine is None:
             from llm.engine import llm_engine
 
             engine = llm_engine
+
         self.engine = engine
 
     def create(
@@ -157,8 +202,10 @@ class AdaptationService:
         domain_request: SolicitudAdaptacion,
     ) -> AdaptationRecord | None:
         document = self.document_service.get(document_id)
+
         if document is None:
             return None
+
         return self.repository.create(
             document_id=document.id,
             document_title=document.title,
@@ -170,31 +217,51 @@ class AdaptationService:
         )
 
     def process(self, adaptation_id: int) -> None:
-        record = self.repository.update(adaptation_id, status="processing", error=None)
+        record = self.repository.update(
+            adaptation_id,
+            status="processing",
+            error=None,
+        )
+
         if record is None:
             return
+
         try:
             result = self.engine.adapt_content(record.domain_request)
+
+            # El indicador disponible actualmente es el anclaje a la fuente.
             score = result.evaluacion_calidad.anclaje_fuente_score
+            approved = score >= 0.8
+
+            # No inventamos motivos de fallo para criterios que no se evalúan
+            # de forma independiente.
+            issues = []
+
+            if not approved:
+                issues.append(
+                    "El indicador de anclaje a la fuente no alcanzó "
+                    "el umbral de aprobación del 80 %. Contrasta la "
+                    "información importante con el documento original "
+                    "antes de utilizarla."
+                )
+
             self.repository.update(
                 adaptation_id,
                 status="completed",
                 official_response=result.model_dump(mode="json"),
                 content=result.contenido_adaptado.model_dump(mode="json"),
                 evaluation={
-                    "approved": score >= 0.8,
+                    "approved": approved,
                     "score": score,
                     "criteria": {
-                        "fidelity": score,
-                        "profile_alignment": score,
-                        "format_compliance": score,
-                        "coherence": score,
+                        "source_grounding": score,
                     },
-                    "issues": [],
+                    "issues": issues,
                 },
                 iteration=1,
                 completed_at=utc_now(),
             )
+
         except Exception as exc:
             self.repository.update(
                 adaptation_id,
@@ -214,6 +281,7 @@ class AdaptationService:
         status: str | None = None,
     ) -> list[AdaptationRecord]:
         records = self.repository.list()
+
         return [
             record
             for record in records

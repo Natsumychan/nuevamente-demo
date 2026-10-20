@@ -178,6 +178,154 @@ function AdaptationMeta({ adaptation }) {
 	);
 }
 
+/**
+ * Guía para revisar el recurso generado y contrastarlo
+ * con el documento original.
+ */
+function ReviewGuide({ adaptation }) {
+	const [checkedItems, setCheckedItems] = useState({});
+
+	const reviewItems = [
+		{
+			id: "concepts",
+			title: "Verificar los conceptos principales",
+			description:
+				"Comprueba que las ideas importantes se expliquen correctamente.",
+		},
+		{
+			id: "facts",
+			title: "Comprobar datos y afirmaciones",
+			description:
+				"Revisa nombres, fechas, cifras y afirmaciones importantes en la fuente.",
+		},
+		{
+			id: "omissions",
+			title: "Identificar omisiones o información dudosa",
+			description:
+				"Busca información relevante que falte, resulte ambigua o no esté respaldada.",
+		},
+		{
+			id: "source",
+			title: "Contrastar con el documento original",
+			description:
+				"Abre el documento original desde la opción de consulta o descarga disponible en NuevaMente y compara los puntos clave.",
+		},
+	];
+
+	const completedCount = reviewItems.filter(
+		(item) => checkedItems[item.id],
+	).length;
+
+	const configuration = [
+		{ label: "Perfil", value: adaptation.profile },
+		{ label: "Formato", value: adaptation.format },
+		{ label: "Sector", value: adaptation.industry },
+		{ label: "Nivel de detalle", value: adaptation.detailLevel },
+	].filter(
+		(item) =>
+			item.value !== null &&
+			item.value !== undefined &&
+			String(item.value).trim() !== "",
+	);
+
+	return (
+		<Card>
+			<div className='space-y-6'>
+				<div>
+					<h2 className='text-lg font-semibold text-slate-100'>
+						Revisa tu recurso antes de utilizarlo
+					</h2>
+					<p className='mt-1 text-sm text-slate-300'>
+						Comprueba que el contenido adaptado sea claro, útil y coherente con
+						el documento original.
+					</p>
+				</div>
+
+				{configuration.length > 0 && (
+					<section aria-labelledby='review-configuration-title'>
+						<h3
+							id='review-configuration-title'
+							className='mb-3 text-sm font-semibold text-slate-200'>
+							Configuración utilizada
+						</h3>
+
+						<div className='flex flex-wrap gap-2'>
+							{configuration.map((item) => (
+								<div
+									key={item.label}
+									className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-2'>
+									<p className='text-xs text-slate-500'>{item.label}</p>
+									<p className='text-sm font-medium text-slate-800'>
+										{item.value}
+									</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)}
+
+				<section aria-labelledby='review-checklist-title'>
+					<div className='mb-3 flex flex-wrap items-center justify-between gap-2'>
+						<h3
+							id='review-checklist-title'
+							className='text-sm font-semibold text-slate-200'>
+							Lista de comprobación
+						</h3>
+
+						<Badge variant='default'>
+							{completedCount} de {reviewItems.length}
+						</Badge>
+					</div>
+
+					<div className='space-y-3'>
+						{reviewItems.map((item) => (
+							<label
+								key={item.id}
+								className='flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 transition-colors hover:bg-slate-50'>
+								<input
+									type='checkbox'
+									checked={Boolean(checkedItems[item.id])}
+									onChange={(event) =>
+										setCheckedItems((previous) => ({
+											...previous,
+											[item.id]: event.target.checked,
+										}))
+									}
+									className='mt-1 h-4 w-4 shrink-0 accent-green-600'
+								/>
+
+								<span className='min-w-0'>
+									<span className='block text-sm font-medium text-slate-100'>
+										{item.title}
+									</span>
+									<span className='mt-1 block text-sm text-slate-300'>
+										{item.description}
+									</span>
+								</span>
+							</label>
+						))}
+					</div>
+				</section>
+
+				<div
+					role='note'
+					className='rounded-lg border border-amber-200 bg-amber-50 p-4'>
+					<p className='text-sm font-semibold text-amber-900'>
+						Importante: revisa antes de compartir
+					</p>
+					<p className='mt-1 text-sm text-amber-800'>
+						La adaptación automática puede contener errores, omisiones o
+						interpretaciones inexactas. Una puntuación de similitud de
+						fragmentos, si está disponible, no garantiza la exactitud del
+						contenido. Contrasta siempre la información importante con el
+						documento original.
+					</p>
+				</div>
+			</div>
+		</Card>
+	);
+}
+
 function PageHeader({ adaptation, onExport, exporting }) {
 	return (
 		<div className='flex flex-wrap items-center justify-between gap-3'>
@@ -357,7 +505,12 @@ export function ResultPage() {
 
 			{/* Contenido generado */}
 			{adaptation.status === "completed" && (
-				<ContentViewer adaptation={adaptation} />
+				<>
+					<ContentViewer adaptation={adaptation} />
+
+					{/* Guía de revisión del recurso */}
+					<ReviewGuide adaptation={adaptation} />
+				</>
 			)}
 
 			{/* Error durante la generación */}
