@@ -15,6 +15,20 @@ import { FlashCard } from "../components/FlashCard";
 export function FlashcardsView({ result }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  if (!result || typeof result !== 'object') {
+  return (
+      <div role="alert" className="rounded-xl border border-slate-800 p-6">
+        <h2 className="font-semibold text-slate-100">
+          No pudimos cargar las tarjetas
+        </h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Volvé al resultado de la adaptación e intentá consultar el contenido otra vez.
+        </p>
+      </div>
+    )
+  }
+
+
   if (result.status === "invalid") {
     return (
       <div
