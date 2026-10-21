@@ -59,7 +59,7 @@ function StepHeader({ number, icon: Icon, title, subtitle, active }) {
 				<p
 					className={cn(
 						"flex items-center gap-2 font-semibold transition-colors",
-						active ? "text-slate-200" : "text-slate-500",
+						active ? "text-slate-200" : "text-slate-100",
 					)}>
 					<Icon
 						className='h-4 w-4'
@@ -67,7 +67,7 @@ function StepHeader({ number, icon: Icon, title, subtitle, active }) {
 					/>
 					{title}
 				</p>
-				<p className='text-xs text-slate-500'>{subtitle}</p>
+				<p className='text-xs text-slate-300'>{subtitle}</p>
 			</div>
 		</div>
 	);
@@ -214,7 +214,7 @@ export function NewAdaptationPage() {
 						<div
 							role='status'
 							aria-live='polite'
-							className='flex items-center gap-2 text-sm text-slate-400'>
+							className='flex items-center gap-2 text-sm text-slate-300'>
 							<LoaderCircle className='h-4 w-4 animate-spin' />
 							Estamos cargando tu documento. Espera a que termine el proceso.
 						</div>
@@ -280,14 +280,14 @@ export function NewAdaptationPage() {
 					</div>
 				) : (
 					<div className='space-y-4'>
-						<p className='py-2 text-center text-sm text-slate-500'>
+						<p className='py-2 text-center text-sm text-slate-400'>
 							Primero carga un documento para habilitar este paso.
 						</p>
 
 						<ContextHelp title='¿Por qué debo cargar un documento primero?'>
 							NuevaMente necesita un documento de referencia para generar un
-							recurso basado en el contenido que queries trabajar. Cuando termine
-							la carga, puedes configurar la adaptación.
+							recurso basado en el contenido que queries trabajar. Cuando
+							termine la carga, puedes configurar la adaptación.
 						</ContextHelp>
 					</div>
 				)}
