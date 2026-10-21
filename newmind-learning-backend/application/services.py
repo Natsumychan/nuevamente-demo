@@ -76,9 +76,9 @@ class DocumentService:
             vector_store = default_vector_store
 
         if storage is None:
-            from storage.oci_client import oci_storage
+            from storage.factory import object_storage
 
-            storage = oci_storage
+            storage = object_storage
 
         self.loader = loader
         self.chunker = chunker
